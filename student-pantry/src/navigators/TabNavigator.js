@@ -28,8 +28,8 @@ const TabBar = ({ state, descriptors, navigation }) => {
       style={{
         flexDirection: "row",
         height: "8%",
-        borderWidth: 1,
-        bottom: 15,
+        bottom: 20,
+        backgroundColor: colours.grey,
       }}
     >
       {state.routes.map((route, index) => {
@@ -66,15 +66,11 @@ const TabBar = ({ state, descriptors, navigation }) => {
           <View
             style={{
               flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
               backgroundColor: isFocused
                 ? colours.selectedGreen
                 : colours.green,
               borderRadius: 10,
-              margin: 3,
-              bottom: 10,
-              top: 1,
+              margin: "1%",
             }}
             key={route.key}
           >
@@ -86,10 +82,17 @@ const TabBar = ({ state, descriptors, navigation }) => {
               onPress={onPress}
               onLongPress={onLongPress}
               key={route.key}
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               <Text
                 style={{
                   color: isFocused ? "black" : "white",
+                  fontWeight: "bold",
                 }}
               >
                 {label}

@@ -3,3 +3,5 @@
 @react-navigation/native-stack
 react-native-safe-area-context
 react-native-screens
+react-native-option-menu
+@expo/vector-icons
