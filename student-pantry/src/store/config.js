@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc} from "firebase/firestore"; 
+import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField} from "firebase/firestore"; 
 import { query, where } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -123,26 +123,21 @@ export async function getWastedShared(userID){
 }
 
 //returns list of food items for all users in a pantry
-export async function getSharedPantry(pantryId) {
-   //gets items in a certain pantry ie pantry 3 by looping through all users and getting the food of those whose pantry = pantryId
-   const usersCollectionRef = collection(db, "users");
-   const usersQuerySnapshot = await getDocs(
-     query(usersCollectionRef, where("pantry", "==", pantryId))
-     );
-     const items = [];
-     await Promise.all(
-       usersQuerySnapshot.docs.map(async (userDoc) => {
-      updateExpired(userDoc.id)
-      const foodCollectionRef = collection(db, `users/${userDoc.id}/food`);
-      const foodQuerySnapshot = await getDocs(foodCollectionRef);
-      foodQuerySnapshot.docs.forEach((foodDoc) => {
-        if (foodDoc.data().shared) {
-          items.push(foodDoc.data());
-        }
-      });
-    })
-  );
-  return items;
+export async function getSharedPantry(groupID) {
+  var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
+    const items = [];
+    await Promise.all(
+      querySnapshot.docs.map(async (userDoc) => {
+        const foodCollectionRef = collection(db, `users/${userDoc.id}/food`);
+        const foodQuerySnapshot = await getDocs(query(foodCollectionRef , where("isWasted", "==", false)));
+        foodQuerySnapshot.docs.forEach((foodDoc) => {
+          if (foodDoc.data().shared) {
+            items.push(foodDoc.data());
+          }
+        });
+      })
+    );
+ return items;
 }
 
 //updates isWasted to specified boolean with product id as string 
@@ -193,7 +188,107 @@ export async function updateIsLow(userID, product, boolean){
   });
 }
 
+export async function joinGroup(groupID, userID) {
+  const groupRef = doc(db, `groups/${groupID}`);
+  const userRef = doc(db, `users`, userID);
+  
+  const groupDoc = await getDoc(groupRef);
+  if (!groupDoc.exists()) {
+    return false;
+  }
 
+  await updateDoc(userRef, {
+    groupID: groupID
+  });
+
+  const membersRef = collection(db, `groups/${groupID}/members`);
+  const MemberRef = doc(membersRef, userID);
+  await setDoc(MemberRef, {
+    id: userID
+  });
+
+  return true;
+}
+
+
+export async function leaveGroup(groupID, userID) {
+  const groupRef = doc(db, `groups/${groupID}`);
+  const userRef = doc(db, `users/${userID}`);
+
+  const groupDoc = await getDoc(groupRef);
+  if (!groupDoc.exists()) {
+    return false;
+  }
+
+  const userDoc = await getDoc(userRef);
+  const userGroupID = userDoc.data().groupID;
+
+  await updateDoc(userRef, {
+    groupID: deleteField(),
+  });
+
+  const membersRef = collection(db, `groups/${groupID}/members`);
+  const MemberRef = doc(membersRef, userID);
+  await deleteDoc(MemberRef);
+
+  const groupMembers = await getDocs(membersRef);
+  if (groupMembers.empty) {
+    await deleteDoc(groupRef);
+  }
+  return true;
+}
+
+export async function createGroup(groupID, userID) {
+  const groupsRef = collection(db, `groups`);
+  const newGroupRef = doc(groupsRef, groupID.toString());
+  await setDoc(newGroupRef, {});
+  await joinGroup(groupID, userID);
+  return true;
+}
+
+export async function isInGroup(userID) {
+  const docRef = doc(db, 'users', userID);
+  const docSnapshot = await getDoc(docRef);
+  const docData = docSnapshot.data();
+
+  if (docData && docData.hasOwnProperty('groupID')) 
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+export async function getUsers(groupID)
+{
+const useritems = []
+var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
+  querySnapshot.forEach((doc) => {
+    useritems.push(doc.id);
+  });
+  return useritems
+
+}
+
+export async function generateNumber() {
+  let randomString = "";
+  while (true) {
+    randomString = "";
+    const characters = '0123456789';
+    const charLength = 10;
+    for(let i = 0; i < 6; i++){
+      randomString += characters.charAt(Math.floor(Math.random() * 10));
+    }
+    const groupDoc = await getDoc(doc(db, "groups", randomString));
+    if (!groupDoc.exists()) {
+      break;
+    }
+  }
+  return randomString;
+}
 
 //IGNORE - TESTING FUNCTIONS
 export async function clearFood(userID){
@@ -205,9 +300,22 @@ export async function clearFood(userID){
   });
 }
 export async function makeTestPantry(){
-  addFood("test123", "Cheese", true, "2023 04 15", true, "2023 03 07")
-  addFood("test123", "Ham", false, "2023 03 23", false, "2023 03 07")
-  addFood("test123", "Onion", true, "2023 09 15", false, "2023 03 07")
-  addFood("test123", "Soup", false, "2025 05 04", true, "2023 03 03")
+  await addFood("test123", "Cheese", true, "2023 04 15", true, "2023 03 07")
+  await addFood("test123", "Ham", false, "2023 03 23", false, "2023 03 07")
+  await addFood("test123", "Onion", true, "2023 09 15", false, "2023 03 07")
+  await addFood("test123", "Soup", false, "2025 05 04", true, "2023 03 03")
 }
 
+export async function makeTestPantryG1(){
+  await addFood("testG1", "Cheese", true, "2023 04 15", true, "2023 03 07")
+  await addFood("testG1", "Ham", false, "2023 03 23", false, "2023 03 07")
+  await addFood("testG1", "Onion", true, "2023 09 15", false, "2023 03 07")
+  await addFood("testG1", "Soup", false, "2025 05 04", true, "2023 03 03")
+}
+
+export async function makeTestPantryG2(){
+  await addFood("testG2", "Pizza", false, "2023 04 15", true, "2023 03 07")
+  await addFood("testG2", "Kimchi", true, "2023 03 23", true, "2023 03 07")
+  await addFood("testG2", "Pepper", true, "2023 09 15", false, "2023 03 07")
+  await addFood("testG2", "Pork", false, "2025 05 04", true, "2023 03 03")
+}
