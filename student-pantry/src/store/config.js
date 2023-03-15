@@ -16,6 +16,7 @@ const db = getFirestore(app);
 
 /*food items must be of form 
 {
+owner: userID
 id: product,
 isLow: low,
 shared: shared,
@@ -33,11 +34,14 @@ export async function addFood(userID, product, low, useby, shared, purchaseDate)
   const collectionRef = collection(db, `users/${userID}/food`);
   const fooditem = doc(collectionRef, product);
   await setDoc(fooditem, {
+    owner: userID,
     id: product,
     isLow: low,
     shared: shared,
-    useBy: Timestamp.fromDate(new Date(useby)),
-    purchaseDate: Timestamp.fromDate(new Date(purchaseDate)),
+    // useBy: Timestamp.fromDate(new Date(useby)),
+    // purchaseDate: Timestamp.fromDate(new Date(purchaseDate)),
+    useBy: new Date(useby),
+    purchaseDate: new Date(purchaseDate),
     isWasted: false, 
   });
 }
