@@ -6,22 +6,32 @@ import colours from "../constants/colours";
 import OptionMenu from "react-native-option-menu";
 import { AntDesign } from "@expo/vector-icons";
 
-/**Pass as props: low: bool, item: string, bought: string, useby: string
-/Like this: \<PersonalCard low={true} item="Onion" useby="xxxz">*/
+/**Pass as props: low: bool, item: string, bought: string, useby: string isShared: bool
+/Like this: \<PersonalCard low={true} item="Onion" useby="xxxz" isShared={true}>*/
+//id, isLow, isWasted, owner, purchaseDate, shared, useBy
 export const PersonalCard = (props) => {
   //const [isLow, setIslow] = useState(false);
-  const col = props.low && props.low ? colours.alertRed : colours.green;
-  const fontCol = props.low && props.low ? colours.white : colours.black;
+  const col = props.isLow && props.isLow ? colours.alertRed : colours.green;
+  const fontCol = props.isLow && props.isLow ? colours.white : colours.black;
 
   //options for card
   //mark low, delete (used), delete (wasted), get info
-  const [options, optionFuncs] = getOptions(props.low);
+  const [options, optionFuncs] = getOptions(props.isLow);
+
+  //formatting of date strings
+  const ub_date = new Date(props.useBy.seconds * 1000);
+  const useby = ub_date.toLocaleDateString("en-uk");
+
+  const pd_date = new Date(props.purchaseDate.seconds * 1000);
+  const purchaseDate = pd_date.toLocaleDateString("en-uk");
 
   const buttonIcon = (
     <AntDesign name="exclamationcircle" size={28} color="black" />
   );
   return (
-    <Card style={{ backgroundColor: col, flexDirection: "col" }}>
+    <Card
+      style={{ backgroundColor: col, flexDirection: "col", ...props.style }}
+    >
       <View style={{ flexDirection: "row", flex: 1 }}>
         <View
           style={{
@@ -29,12 +39,12 @@ export const PersonalCard = (props) => {
             justifyContent: "space-around",
           }}
         >
-          <Text style={[styles.title, { color: fontCol }]}>{props.item}</Text>
+          <Text style={[styles.title, { color: fontCol }]}>{props.id}</Text>
           <Text style={[styles.minorText, { color: fontCol }]}>
-            Bought: {props.bought}
+            Bought: {purchaseDate}
           </Text>
           <Text style={[styles.minorText, { color: fontCol }]}>
-            Use By: {props.useby}
+            Use By: {useby}
           </Text>
         </View>
 
@@ -62,7 +72,7 @@ export const PersonalCard = (props) => {
           <View style={{ flex: 4 }} />
         </View>
       </View>
-      {props.isShared && (
+      {props.shared && (
         <View
           style={{
             borderWidth: 2,

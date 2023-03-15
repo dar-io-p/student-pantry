@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text, TouchableOpacity } from "react-native";
@@ -8,15 +8,49 @@ import colours from "../constants/colours";
 import PantryScreen from "../screens/PantryScreen";
 import GroupScreen from "../screens/GroupScreen";
 import AdviceScreen from "../screens/AdviceScreen";
+import LoginScreen from "../screens/LoginScreen";
+
+import { AddToPantryModal } from "../components/AddToPantryModal";
+import { GroupModal } from "../components/GroupModal";
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   return (
-    <Tab.Navigator tabBar={(props) => <TabBar {...props} />}>
-      <Tab.Screen name="pantry" component={PantryScreen} />
-      <Tab.Screen name="group" component={GroupScreen} />
-      <Tab.Screen name="advice" component={AdviceScreen} />
+    <Tab.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colours.green },
+        headerTintColor: "black",
+        headerTitleStyle: { fontWeight: "bold" },
+      }}
+      tabBar={(props) => <TabBar {...props} />}
+    >
+      <Tab.Screen
+        name="login"
+        component={LoginScreen}
+        options={{ title: "Login" }}
+      />
+      <Tab.Screen
+        name="pantry"
+        component={PantryScreen}
+        options={{
+          title: "Pantry",
+          headerRight: (props) => <AddToPantryModal {...props} />,
+        }}
+      />
+      <Tab.Screen
+        name="group"
+        component={GroupScreen}
+        options={{
+          title: "Group",
+          headerRight: (props) => <GroupModal {...props} />,
+        }}
+      />
+      <Tab.Screen
+        name="advice"
+        component={AdviceScreen}
+        options={{ title: "Advice" }}
+      />
     </Tab.Navigator>
   );
 }
