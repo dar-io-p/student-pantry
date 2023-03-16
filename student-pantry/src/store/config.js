@@ -285,6 +285,18 @@ export async function generateNumber() {
   return randomString;
 }
 
+export async function getGroupID(userID){
+  const inGroup = await isInGroup(userID);
+  if(!inGroup){
+    return false;
+  }
+  const docRef = doc(db, 'users', userID);
+  const docSnapshot = await getDoc(docRef);
+  const docData = docSnapshot.data();
+
+  return docData.groupID;
+}
+
 export async function clearFood(userID){
     const collectionRef = collection(db, `users/${userID}/food`);
     var q = query(collectionRef);
@@ -313,3 +325,5 @@ export async function clearFood(userID){
     await addFood("testG2", "Pepper", true, "2023 09 15", false, "2023 03 07")
     await addFood("testG2", "Pork", false, "2025 05 04", true, "2023 03 03")
   }
+console.log(await isInGroup("test456"))
+console.log(await getGroupID("test456"))
