@@ -1,6 +1,7 @@
-import { initializeApp } from 'firebase/app';
+import { getApp, initializeApp } from 'firebase/app';
 import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField} from "firebase/firestore"; 
 import { query, where } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDADBZ0U_i7OPlgIdu1t5wgz8NJT9ifzU0",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 /*food items must be of form 
 {
@@ -325,5 +327,3 @@ export async function clearFood(userID){
     await addFood("testG2", "Pepper", true, "2023 09 15", false, "2023 03 07")
     await addFood("testG2", "Pork", false, "2025 05 04", true, "2023 03 03")
   }
-console.log(await isInGroup("test456"))
-console.log(await getGroupID("test456"))
