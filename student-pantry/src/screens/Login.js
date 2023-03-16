@@ -1,16 +1,17 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import React, {useState} from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { firebase } from '../config_kevin'
+import {app, auth, db} from '../store/config.js';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const Login = () => {
     const navigation = useNavigation()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    loginUser = async (email,password) => {
+    loginUser = async (email, password) => {
         try{
-            await firebase.auth().signInWithEmailAndPassword(email,password)
+            await signInWithEmailAndPassword(auth, email, password)
         } catch (error){
           alert(error)
         }
@@ -18,13 +19,18 @@ const Login = () => {
 
     // forget password
     const forgetPassword = () => {
-        firebase.auth().sendPasswordResetEmail(email)
-        .then(() => {
-            alert('Password reset email sent!')
-        })
-        .catch(error => {
-            alert(error)
-        })
+      onAuthStateChanged(auth, async (user) =>  {
+        if (user) {
+          try {
+            await sendPasswordResetEmail(auth, user.email);
+            alert("Password reset email sent!")
+          } catch (error) {
+            console.log(error)
+          }
+        } else {
+          console.log("User not signed in")
+        }
+      });
     }
 
     return (

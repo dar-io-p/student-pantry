@@ -4,7 +4,8 @@ import TabNavigator from "./src/navigators/TabNavigator";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { useState, useEffect } from 'react';
-import { firebase } from './config_kevin'
+import {auth} from './src/store/config'
+import { onAuthStateChanged } from "firebase/auth";
 
 
 import Login from "./src/Login.js";
@@ -14,22 +15,16 @@ import Dashboard from "./src/Dashboard.js";
 
 const Stack = createStackNavigator();
 
-
 function App() {
-  const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
-  // Handle user state changes
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-  useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; 
-  }, []);
-
-  if (initializing) return null;
+  onAuthStateChanged(auth, (user) =>  {
+    if (user) {
+      setUser(user.displayName);
+    } else {
+      console.log("User not signed in")
+    }
+  })
 
   if (!user) {
     return (

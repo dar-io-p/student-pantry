@@ -1,41 +1,33 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
 import React, {useState} from 'react'
-import { firebase } from '../config_kevin'
+import {app, auth, db} from '../store/config.js';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { setDoc } from '@firebase/firestore';
+
 
 const Registration = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [displayName, setDisplayName] = useState('')
 
-    registerUser = async (email,password, firstName, lastName) => {
-        await firebase.auth().createUserWithEmailAndPassword(email,password)
-        .then(() => {
-          firebase.auth().currentUser.sendEmailVerification({
-            handleCodeInApp: true,
-            url: 'https://expo-33883.firebaseapp.com',
-           })
-          .then(() => {
-                alert("Email sent")
-            }).catch((error) => {
-                alert(error)
-            })
-            .then(() => {
-              firebase.firestore().collection("users")
-              .doc(firebase.auth().currentUser.uid)
-              .set({
-                  firstName,
-                  lastName,
-                  email,
-              })
-            })
-            .catch((error) => {
-              alert(error)
-          })
-        })
-        .catch((error) => {
-            alert(error)
-        })
+    registerUser = async (email,password, displayName) => {
+        await createUserWithEmailAndPassword(auth, email, password)
+        onAuthStateChanged(auth, async (user) =>  {
+          if (user) {
+            try {
+              await sendEmailVerification(user)
+              await updateProfile(user, {displayName: displayName});
+              alert("Email sent")
+            } catch (error) {
+              console.log(error)
+            }
+          } else {
+            console.log("User not signed in")
+          }
+        });
+        const usersRef = collection(db, `users`);
+        const newUserRef = doc(usersRef, displayName);
+        await setDoc(newUserRef, {});
     }
 
 
@@ -46,14 +38,9 @@ const Registration = () => {
         </Text>
         <View style={{marginTop:40}}>
           <TextInput style={styles.textInput} 
-              placeholder="First Name" 
-              onChangeText={(firstName) => setFirstName(firstName)}
+              placeholder="Display Name" 
+              onChangeText={(displayName) => setDisplayName(displayName)}
               autoCorrect={false}
-          />
-          <TextInput style={styles.textInput} 
-            placeholder="Last Name" 
-            onChangeText={(lastName) => setLastName(lastName)}
-            autoCorrect={false}
           />
           <TextInput style={styles.textInput} 
             placeholder="Email" 
@@ -71,7 +58,7 @@ const Registration = () => {
           />
         </View>
         <TouchableOpacity
-            onPress={()=>registerUser(email,password, firstName, lastName)}
+            onPress={()=>registerUser(email, password, displayName)}
             style={styles.button}
         >
           <Text style={{fontWeight:'bold', fontSize:22}}>Register</Text>
