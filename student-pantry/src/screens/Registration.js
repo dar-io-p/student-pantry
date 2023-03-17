@@ -3,6 +3,7 @@ import React, {useState} from 'react'
 import {app, auth, db} from '../store/config.js';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { setDoc } from 'firebase/firestore';
+import {registerUser} from '../store/auth-config'
 
 
 const Registration = () => {
@@ -10,27 +11,7 @@ const Registration = () => {
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
 
-    registerUser = async (email,password, displayName) => {
-        await createUserWithEmailAndPassword(auth, email, password)
-        onAuthStateChanged(auth, async (user) =>  {
-          if (user) {
-            try {
-              await sendEmailVerification(user)
-              await updateProfile(user, {displayName: displayName});
-              alert("Email sent")
-            } catch (error) {
-              console.log(error)
-            }
-          } else {
-            console.log("User not signed in")
-          }
-        });
-        const usersRef = collection(db, `users`);
-        const newUserRef = doc(usersRef, displayName);
-        await setDoc(newUserRef, {});
-    }
-
-
+    
   return (
     <View style={styles.container}>
         <Text style={{fontWeight:'bold', fontSize:23,}}>

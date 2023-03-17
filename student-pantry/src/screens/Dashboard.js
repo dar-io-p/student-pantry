@@ -1,26 +1,12 @@
 import React,{useState, useEffect} from 'react'
 import { Text , StyleSheet, SafeAreaView, TouchableOpacity} from 'react-native'
 import {app, auth, db} from '../store/config.js';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, signOut } from 'firebase/auth';
+import {changePassword} from '../store/auth-config'
 
 const Dashboard = () => {
   const [name, setName] = useState([]);
 
-  // change the password
-  const changePassword = async () => {
-    onAuthStateChanged(auth, async (user) =>  {
-      if (user) {
-        try {
-          await sendPasswordResetEmail(auth, user.email);
-          alert("Password reset email sent!")
-        } catch (error) {
-          console.log(error)
-        }
-      } else {
-        console.log("User not signed in")
-      }
-    });
-  }
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) =>  {
@@ -48,8 +34,8 @@ const Dashboard = () => {
           <Text style={{fontWeight:'bold', fontSize:22}}>Change Password</Text>
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={()=>{
-              firebase.auth().signOut();
+            onPress={async ()=>{
+              await signOut(auth);
           }}
             style={styles.button}
         >

@@ -3,35 +3,13 @@ import React, {useState} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {app, auth, db} from '../store/config.js';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import {changePassword, loginUser} from '../store/auth-config'
 
 const Login = () => {
     const navigation = useNavigation()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    loginUser = async (email, password) => {
-        try{
-            await signInWithEmailAndPassword(auth, email, password)
-        } catch (error){
-          alert(error)
-        }
-    }
-
-    // forget password
-    const forgetPassword = () => {
-      onAuthStateChanged(auth, async (user) =>  {
-        if (user) {
-          try {
-            await sendPasswordResetEmail(auth, user.email);
-            alert("Password reset email sent!")
-          } catch (error) {
-            console.log(error)
-          }
-        } else {
-          console.log("User not signed in")
-        }
-      });
-    }
 
     return (
       <View style={styles.container}>
@@ -69,7 +47,7 @@ const Login = () => {
           
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={()=>{forgetPassword()}}
+          onPress={()=>{changePassword()}}
           style={{marginTop:20,}}
         >
           <Text style={{fontSize:16, fontWeight:'bold'}}>
