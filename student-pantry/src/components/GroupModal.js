@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Text,
@@ -13,9 +13,18 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import colours from "../constants/colours";
 
-export function GroupModal(props) {
+import {
+  joinGroup,
+  leaveGroup,
+  getGroupID,
+  generateNumber,
+  createGroup,
+} from "../store/config";
+
+const uid = "test123";
+
+export function GroupModal({ inGroup, setDBUpdate }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [isInGroup, setIsInGroup] = useState(false);
 
   return (
     <View>
@@ -31,9 +40,10 @@ export function GroupModal(props) {
         <View style={styles.centeredContainer}>
           <View style={styles.modalView}>
             <ModalContents
-              isInGroup={isInGroup}
+              inGroup={inGroup}
               modalVisible={modalVisible}
               setModalVisible={setModalVisible}
+              setDBUpdate={setDBUpdate}
             />
             <View
               style={{
@@ -61,16 +71,40 @@ export function GroupModal(props) {
   );
 }
 
-function ModalContents({ isInGroup, setModalVisible, modalVisible }) {
-  if (isInGroup) {
+function ModalContents({
+  inGroup,
+  setModalVisible,
+  modalVisible,
+  setDBUpdate,
+}) {
+  const handleLeaveGroup = () => {
+    leaveGroup(groupid, uid).then((result) => {
+      if (result) console.log("Success");
+      else console.log("Fail");
+      setDBUpdate(true);
+    });
+    setModalVisible(!modalVisible);
+  };
+
+  const [groupid, setgroupid] = useState("");
+
+  if (inGroup) {
+    useEffect(() => {
+      getGroupID(uid)
+        .then((val) => {
+          setgroupid(val);
+        })
+        .catch((err) => console.log(err));
+    }, []);
+
     //USER IS IN GROUP
     return (
       <View>
-        <Text style={{ fontSize: 20 }}>Group Code: xyz</Text>
+        <Text style={{ fontSize: 20 }}>Group Code: {groupid}</Text>
         <View style={styles.button}>
           <Button
             title="Leave Group"
-            onPress={() => setModalVisible(!modalVisible)}
+            onPress={handleLeaveGroup}
             color="black"
           />
         </View>
@@ -78,17 +112,42 @@ function ModalContents({ isInGroup, setModalVisible, modalVisible }) {
     );
   }
 
+  const handleJoinGroup = () => {
+    joinGroup(groupid, uid).then((result) => {
+      if (result) console.log("Success");
+      else console.log("FAIL");
+      setDBUpdate(true);
+    });
+    setModalVisible(!modalVisible);
+  };
+
+  const [generatedID, setGeneratedID] = useState("");
+
   //USER NOT IN GROUP
+  useEffect(() => {
+    generateNumber().then((val) => {
+      setGeneratedID(val);
+    });
+  }, []);
+
+  const handleCreateGroup = () => {
+    createGroup(generatedID, uid).then((res) => {
+      if (res) console.log("success");
+      else console.log("Failure");
+      setDBUpdate(true);
+    });
+  };
+
   return (
     <View style={{ alignItems: "center" }}>
-      <Text style={{ fontSize: 22 }}>XXXX</Text>
+      <Text style={{ fontSize: 22 }}>{generatedID}</Text>
       <View style={styles.button}>
         <Button
           title="Create Group with Group ID"
           color={colours.black}
           onPress={() => {
             setModalVisible(!modalVisible);
-            alert("PRESSED");
+            handleCreateGroup();
           }}
         />
       </View>
@@ -102,6 +161,7 @@ function ModalContents({ isInGroup, setModalVisible, modalVisible }) {
           placeholderTextColor="grey"
           textAlign="center"
           keyboardType="numeric"
+          onChangeText={(t) => setgroupid(t)}
         />
       </View>
 
@@ -109,9 +169,7 @@ function ModalContents({ isInGroup, setModalVisible, modalVisible }) {
         <Button
           title="Join Group with Group ID"
           color={colours.black}
-          onPress={() => {
-            alert("ALERT");
-          }}
+          onPress={handleJoinGroup}
         />
       </View>
     </View>

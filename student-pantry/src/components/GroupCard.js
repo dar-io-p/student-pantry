@@ -6,6 +6,8 @@ import colours from "../constants/colours";
 import OptionMenu from "react-native-option-menu";
 import { AntDesign } from "@expo/vector-icons";
 
+import { updateIsLow, updateWasted, removeProduct } from "../store/config";
+
 /**Pass as props: low: bool, item: string, bought: string, useby: string
 /Like this: \<GroupCard owner="Bob" low={true} item="Onion" useby="xxxz">*/
 //id, isLow, isWasted, owner, purchaseDate, shared, useBy
@@ -13,8 +15,6 @@ export const GroupCard = (props) => {
   //const [isLow, setIslow] = useState(false);
   const col = props.isLow && props.isLow ? colours.alertRed : colours.green;
   const fontCol = props.isLow && props.isLow ? colours.white : colours.black;
-
-  const [options, optionFuncs] = getOptions(props.isLow);
 
   //formatting of date strings
   const ub_date = new Date(props.useBy.seconds * 1000);
@@ -26,6 +26,31 @@ export const GroupCard = (props) => {
   const buttonIcon = (
     <AntDesign name="exclamationcircle" size={28} color="black" />
   );
+
+  const options = [
+    props.isLow ? "Mark High" : "Mark Low",
+    "Waste",
+    "Delete",
+    "Get info",
+  ];
+
+  const optionFuncs = [
+    () => {
+      //UPDATE IS LOW
+      updateIsLow(props.owner, props.id, !props.isLow).then(() =>
+        props.setDBUpdate(true)
+      );
+    },
+    () => {
+      //ADD IT TO WASTED
+      updateWasted(props.owner, props.id).then(() => props.setDBUpdate(true));
+    },
+    () => {
+      removeProduct(props.owner, props.id).then(() => props.setDBUpdate(true));
+    },
+    () => alert("info"),
+  ];
+
   return (
     <Card
       style={{ backgroundColor: col, flexDirection: "row", ...props.style }}
