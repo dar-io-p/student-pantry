@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-nativ
 import React, {useState} from 'react'
 import {app, auth, db} from '../store/config.js';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
-import { setDoc } from '@firebase/firestore';
+import { setDoc } from 'firebase/firestore';
 
 
 const Registration = () => {
