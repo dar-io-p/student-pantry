@@ -1,7 +1,6 @@
-import { getApp, initializeApp } from 'firebase/app';
-import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField} from "firebase/firestore"; 
-import { query, where } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField, query, where} from "firebase/firestore"; 
+import {getAuth} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDADBZ0U_i7OPlgIdu1t5wgz8NJT9ifzU0",
@@ -12,9 +11,9 @@ const firebaseConfig = {
   appId: "1:535500183633:web:82a8874e764ca6d1698070"
 }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
 /*food items must be of form 
 {
