@@ -8,7 +8,7 @@ import { getSharedPantry, isInGroup, getGroupID } from "../store/config";
 
 export default function GroupScreen({ navigation }) {
   //const groupid = "123456";
-  const uid = "test123";
+  const uid = "Dario";
 
   const isFocused = useIsFocused();
   const [inGroup, setInGroup] = useState(false);

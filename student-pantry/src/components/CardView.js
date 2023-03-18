@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView } from "react-native";
+import { View } from "react-native";
 
 import { PersonalCard } from "./PersonalCard";
 
@@ -11,25 +11,25 @@ export const CardView = ({ data, setDBUpdate, style }) => {
   });
 
   return (
-    <ScrollView
-      contentContainerStyle={{
+    <View
+      style={{
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-around",
-        alignContent: "center",
+        alignContent: "space-between",
+        marginBottom: "3%",
       }}
-      style={style}
     >
       {sortedData.map((item, key) => {
         return (
           <PersonalCard
             {...item}
             key={key}
-            style={{ marginTop: "3%" }}
             setDBUpdate={setDBUpdate}
+            style={{ marginTop: "3%" }}
           />
         );
       })}
-    </ScrollView>
+    </View>
   );
 };

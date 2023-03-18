@@ -12,7 +12,7 @@ import {
   removeProduct,
 } from "../store/config";
 
-const id = "test123";
+const id = "Dario";
 
 /**Pass as props: 
 id, isLow, isWasted, owner, purchaseDate, shared, useBy*/
@@ -32,7 +32,7 @@ export const PersonalCard = (props) => {
 
   const options = [
     props.isLow ? "Mark High" : "Mark Low",
-    props.shared ? "Remove from shared pantry?" : "Add to shared pantry",
+    props.shared ? "Remove from shared pantry" : "Add to shared pantry",
     "Waste",
     "Delete",
     "Get info",
@@ -53,7 +53,12 @@ export const PersonalCard = (props) => {
     },
     () => {
       //ADD IT TO WASTED
-      updateWasted(id, props.id).then(() => props.setDBUpdate(true));
+      updateWasted(id, props.id)
+        .then(() => {
+          props.setDBUpdate(true);
+          console.log("Wasted");
+        })
+        .catch((err) => console.log(err));
     },
     () => {
       removeProduct(id, props.id).then(() => props.setDBUpdate(true));

@@ -22,11 +22,13 @@ export function AddToPantryModal({ setData }) {
   const [pd, setPD] = useState(today);
   const [ub, setUB] = useState(today);
 
-  const id = "test123";
+  const id = "Dario";
 
-  const handleAddData = async () => {
-    await addFood(id, item, false, ub, false, pd);
-    getNotWasted(id).then((d) => setData(d));
+  const handleAddData = () => {
+    addFood(id, item, false, ub, false, pd).then(() => {
+      console.log("successfully added food");
+      getNotWasted(id).then((d) => setData(d));
+    });
   };
 
   return (

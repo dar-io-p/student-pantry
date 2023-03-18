@@ -21,7 +21,7 @@ import {
   createGroup,
 } from "../store/config";
 
-const uid = "test123";
+const uid = "Dario";
 
 export function GroupModal({ inGroup, setDBUpdate }) {
   const [modalVisible, setModalVisible] = useState(false);
