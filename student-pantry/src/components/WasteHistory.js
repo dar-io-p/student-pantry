@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-import { getWastedIndiv } from "../store/config";
-
-const uid = "Dario";
+import { getWasted, auth } from "../store/config";
 
 export default function ({ style, dbUpdate }) {
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    getWastedIndiv(uid).then((val) => {
+    getWasted(uid).then((val) => {
       setData(val);
+      console.log("Waste updated");
     });
   }, [dbUpdate]);
 
@@ -18,7 +18,12 @@ export default function ({ style, dbUpdate }) {
     <View style={style}>
       <Text style={styles.title}>Waste History</Text>
       {data.map((item, index) => {
-        return <Text style={styles.rowItem}> - {item.id}</Text>;
+        return (
+          <Text key={index} style={styles.rowItem}>
+            {" "}
+            - {item.id}
+          </Text>
+        );
       })}
     </View>
   );

@@ -8,22 +8,24 @@ import { getNotWasted } from "../store/config";
 import ShoppingList from "../components/ShoppingList";
 import WasteHistory from "../components/WasteHistory";
 
-const id = "Dario";
+import { auth } from "../store/config";
 
 export default function PantryScreen({ navigation }) {
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
+
   const [data, setData] = useState([]);
   const [dbUpdate, setDBUpdate] = useState(false);
 
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    getNotWasted(id).then((d) => {
+    getNotWasted(uid).then((d) => {
       setData(d);
     });
   }, [isFocused]);
 
   useEffect(() => {
-    getNotWasted(id).then((d) => {
+    getNotWasted(uid).then((d) => {
       setData(d);
       setDBUpdate(false);
     });
@@ -40,7 +42,7 @@ export default function PantryScreen({ navigation }) {
       <ScrollView>
         <CardView data={data} setDBUpdate={setDBUpdate} />
         <ShoppingList style={styles.shopping} />
-        <WasteHistory style={styles.history} />
+        <WasteHistory dbUpdate={dbUpdate} style={styles.history} />
       </ScrollView>
     </View>
   );

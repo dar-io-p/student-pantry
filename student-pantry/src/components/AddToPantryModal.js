@@ -13,7 +13,7 @@ import { AntDesign } from "@expo/vector-icons";
 import colours from "../constants/colours";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-import { addFood, getNotWasted } from "../store/config";
+import { addFood, getNotWasted, auth } from "../store/config";
 
 export function AddToPantryModal({ setData }) {
   const today = new Date();
@@ -22,12 +22,12 @@ export function AddToPantryModal({ setData }) {
   const [pd, setPD] = useState(today);
   const [ub, setUB] = useState(today);
 
-  const id = "Dario";
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
 
   const handleAddData = () => {
-    addFood(id, item, false, ub, false, pd).then(() => {
+    addFood(uid, item, false, ub, false, pd).then(() => {
       console.log("successfully added food");
-      getNotWasted(id).then((d) => setData(d));
+      getNotWasted(uid).then((d) => setData(d));
     });
   };
 

@@ -10,15 +10,15 @@ import {
   updateIsLow,
   updateWasted,
   removeProduct,
+  auth,
 } from "../store/config";
-
-const id = "Dario";
 
 /**Pass as props: 
 id, isLow, isWasted, owner, purchaseDate, shared, useBy*/
 export const PersonalCard = (props) => {
   //const [isLow, setIsLow] = useState(props.isLow);
   //const [shared, setShared] = useState(props.shared);
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
 
   const col = props.isLow && props.isLow ? colours.alertRed : colours.green;
   const fontCol = props.isLow && props.isLow ? colours.white : colours.black;
@@ -41,19 +41,20 @@ export const PersonalCard = (props) => {
   const optionFuncs = [
     () => {
       //UPDATE IS LOW
-      updateIsLow(id, props.id, !props.isLow).then(() =>
+      updateIsLow(uid, props.id, !props.isLow).then(() =>
         props.setDBUpdate(true)
       );
     },
     () => {
       //UPDATE SHARED
-      updateShared(id, props.id, !props.shared).then(() =>
-        props.setDBUpdate(true)
-      );
+      updateShared(uid, props.id, !props.shared).then(() => {
+        props.setDBUpdate(true);
+        console.log("Updated Shared");
+      });
     },
     () => {
       //ADD IT TO WASTED
-      updateWasted(id, props.id)
+      updateWasted(uid, props.id)
         .then(() => {
           props.setDBUpdate(true);
           console.log("Wasted");
@@ -61,7 +62,7 @@ export const PersonalCard = (props) => {
         .catch((err) => console.log(err));
     },
     () => {
-      removeProduct(id, props.id).then(() => props.setDBUpdate(true));
+      removeProduct(uid, props.id).then(() => props.setDBUpdate(true));
     },
     () => alert("info"),
   ];

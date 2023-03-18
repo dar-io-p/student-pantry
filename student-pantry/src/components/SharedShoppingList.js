@@ -17,7 +17,7 @@ import {
 
 import { auth } from "../store/config";
 
-export default function (props) {
+export default function ({ style, groupid }) {
   const uid = auth.currentUser ? auth.currentUser.displayName : "";
 
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -55,7 +55,7 @@ export default function (props) {
   };
 
   return (
-    <View style={props.style}>
+    <View style={style}>
       <Dialog.Container visible={dialogVisible}>
         <Dialog.Title>New Item</Dialog.Title>
         <Dialog.Input onChangeText={(t) => setNewItemText(t)} />

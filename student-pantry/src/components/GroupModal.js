@@ -19,13 +19,12 @@ import {
   getGroupID,
   generateNumber,
   createGroup,
+  auth,
 } from "../store/config";
 
-const uid = "Dario";
-
 export function GroupModal({ inGroup, setDBUpdate }) {
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
   const [modalVisible, setModalVisible] = useState(false);
-
   return (
     <View>
       <Modal
@@ -44,6 +43,7 @@ export function GroupModal({ inGroup, setDBUpdate }) {
               modalVisible={modalVisible}
               setModalVisible={setModalVisible}
               setDBUpdate={setDBUpdate}
+              uid={uid}
             />
             <View
               style={{
@@ -76,6 +76,7 @@ function ModalContents({
   setModalVisible,
   modalVisible,
   setDBUpdate,
+  uid,
 }) {
   const handleLeaveGroup = () => {
     leaveGroup(groupid, uid).then((result) => {

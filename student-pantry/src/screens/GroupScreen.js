@@ -6,9 +6,10 @@ import { GroupModal } from "../components/GroupModal";
 import { useIsFocused } from "@react-navigation/native";
 import { getSharedPantry, isInGroup, getGroupID } from "../store/config";
 
+import { auth } from "../store/config";
+
 export default function GroupScreen({ navigation }) {
-  //const groupid = "123456";
-  const uid = "Dario";
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
 
   const isFocused = useIsFocused();
   const [inGroup, setInGroup] = useState(false);
