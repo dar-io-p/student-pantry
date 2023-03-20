@@ -5,8 +5,9 @@ import {
   setDoc,
   deleteDoc,
   query,
+  getDoc
 } from "firebase/firestore";
-import { db } from "./config.js";
+import { db, isValidProduct } from "./config.js";
 
 export async function getShoppingList(userID) {
   const listRef = collection(db, `users/${userID}/shoppingList`);
@@ -20,12 +21,51 @@ export async function getShoppingList(userID) {
 }
 
 export async function addFoodShoppingList(userID, product) {
+  if(!isValidProduct(product)) return false;
+
   const listRef = collection(db, `users/${userID}/shoppingList`);
   const food = doc(listRef, product);
   await setDoc(food, {});
+  return true;
 }
 
 export async function removeFoodShoppingList(userID, product) {
+  if(!isValidProduct(product)) return false;
   const foodRef = doc(collection(db, `users/${userID}/shoppingList`), product);
+
+  if(!(await getDoc(foodRef)).exists()) return false;
+
   await deleteDoc(foodRef);
+  return true;
+}
+
+export async function getGroupShoppingList(groupID){
+  const listRef = collection(db, `groups/${groupID}/shoppingList`);
+  var q = query(listRef);
+  var querySnapshot = await getDocs(q);
+
+  const shoppingList = [];
+  querySnapshot.forEach((doc) => {
+    shoppingList.push(doc.id);
+  });
+  return shoppingList;
+}
+
+export async function addFoodGroupShoppingList(groupID, product) {
+  if(!isValidProduct(product)) return false;
+
+  const listRef = collection(db, `groups/${groupID}/shoppingList`);
+  const food = doc(listRef, product);
+  await setDoc(food, {});
+  return true;
+}
+
+export async function removeFoodGroupShoppingList(groupID, product) {
+  if(!isValidProduct(product)) return false;
+  const foodRef = doc(collection(db, `groups/${groupID}/shoppingList`), product);
+
+  if(!(await getDoc(foodRef)).exists()) return false;
+
+  await deleteDoc(foodRef);
+  return true;
 }

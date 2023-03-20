@@ -1,24 +1,6 @@
-import { initializeApp } from "firebase/app";
-import {
-  doc,
-  getFirestore,
-  collection,
-  setDoc,
-  getDocs,
-  Timestamp,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  deleteField,
-} from "firebase/firestore";
-import { query, where } from "firebase/firestore";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField, query, where} from "firebase/firestore"; 
+import {getAuth} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDADBZ0U_i7OPlgIdu1t5wgz8NJT9ifzU0",
@@ -44,16 +26,23 @@ purchaseDate: purchaseDate,
 }
 */
 
-export async function addFood(
-  userID,
-  product,
-  low,
-  useby,
-  shared,
-  purchaseDate
-) {
-  //adds food item document by the name of product to the food list of a certain username
+export function isValidProduct(product){
+  if(typeof(product) == 'string' && /^[A-Za-z\s]*$/.test(product)){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+//adds food item document by the name of product to the food list of a certain username 
+export async function addFood(userID, product, low, useby, shared, purchaseDate){
+  if(!isValidProduct(product) ||  (typeof(low) != 'boolean') || !(useby instanceof Date) || (typeof(shared) != 'boolean') ||  !(purchaseDate instanceof Date)) return false;
+  const userRef = doc(db, `users/${userID}`);
   const collectionRef = collection(db, `users/${userID}/food`);
+
+  if(!(await getDoc(userRef)).exists()) return false;
+
   const fooditem = doc(collectionRef, product);
   await setDoc(fooditem, {
     owner: userID,
@@ -63,19 +52,7 @@ export async function addFood(
     useBy: new Date(useby),
     purchaseDate: new Date(purchaseDate),
   });
-}
-
-//returns list of unshared unwasted food items
-export async function getIndividual(userID) {
-  //get all individual foods for a certain id <-- gets products that would be in individual pantry
-  const collectionRef = collection(db, `users/${userID}/food`);
-  var q = query(collectionRef, where("shared", "==", false));
-  var querySnapshot = await getDocs(q);
-  const indiv = [];
-  querySnapshot.forEach((doc) => {
-    indiv.push(doc.data());
-  });
-  return indiv;
+  return true;
 }
 
 //returns list of shared unwasted food items
@@ -105,81 +82,55 @@ export async function getWasted(userID) {
 }
 
 //returns list of all not wasted food for user
-export async function getNotWasted(userID) {
+export async function getFood(userID) {
   //returns which products are not wasted for a certain user
   const collectionRef = collection(db, `users/${userID}/food`);
   var q = query(collectionRef);
-  const not_wasted = [];
+  const food = [];
   var querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    not_wasted.push(doc.data());
+    food.push(doc.data());
   });
-  return not_wasted;
-}
-
-//returns list of unshared wasted food
-export async function getWastedIndiv(userID) {
-  //getting all the food items which are wasted and are not being shared with different users
-  const collectionRef = collection(db, `users/${userID}/wasteHistory`);
-  var q = query(collectionRef, where("shared", "==", false));
-  const wastedindiv = [];
-  var querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    wastedindiv.push(doc.data());
-  });
-  return wastedindiv;
-}
-
-//returns list of shared wasted food
-export async function getWastedShared(userID) {
-  //getting all the food items which are wasted and are being shared with different users
-  const collectionRef = collection(db, `users/${userID}/wasteHistory`);
-  const wastedshared = [];
-  var q = query(collectionRef, where("shared", "==", true));
-  var querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    wastedshared.push(doc.data());
-  });
-  return wastedshared;
+  return food;
 }
 
 //returns list of food items for all users in a pantry
 export async function getSharedPantry(groupID) {
-  var querySnapshot = await getDocs(
-    collection(db, `groups/${groupID}/members`)
-  );
-  const items = [];
-  await Promise.all(
-    querySnapshot.docs.map(async (userDoc) => {
-      const foodCollectionRef = collection(db, `users/${userDoc.id}/food`);
-      const foodQuerySnapshot = await getDocs(query(foodCollectionRef));
-      foodQuerySnapshot.docs.forEach((foodDoc) => {
-        if (foodDoc.data().shared) {
-          items.push(foodDoc.data());
-        }
-      });
-    })
-  );
+  var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
+  var items = [];
+  var members = [];
+  querySnapshot.forEach((userDoc) => {
+    members.push(userDoc.id)
+  })
+  for(const user of members){
+    var userData = await getShared(user);
+    items = items.concat(userData);
+  }
   return items;
 }
 
-//updates isWasted to specified boolean with product id as string
-export async function updateWasted(userID, product) {
+// moves item to wasteHistory
+export async function updateWasted(userID, product){
+  if(!isValidProduct(product));
   const foodRef = doc(db, `users/${userID}/food`, product);
-  const foodData = await getDoc(foodRef);
+  const foodData = await getDoc(foodRef)
+  if(!foodData.exists()) return false;
+
   const wasteRef = collection(db, `users/${userID}/wasteHistory`);
   const newRef = doc(wasteRef, product);
   await setDoc(newRef, foodData.data());
   await removeProduct(userID, product);
+  return true;
 }
+
 
 //should be called every time pantry accessed
 //checks for all nonwasted foods where current date is past use by date
 export async function updateExpired(userID) {
   const collectionRef = collection(db, `users/${userID}/food`);
   var q = query(collectionRef, where("useBy", "<=", Timestamp.now()));
-  const exp = [];
   var querySnapshot = await getDocs(q);
+  const exp = [];
   querySnapshot.forEach((doc) => {
     exp.push(doc.id);
   });
@@ -189,27 +140,40 @@ export async function updateExpired(userID) {
 }
 
 //deletes product from pantry takes user id product id as string
-export async function removeProduct(userID, product) {
+export async function removeProduct(userID, product){
+  if(!isValidProduct(product)) return false;
   const foodRef = doc(collection(db, `users/${userID}/food`), product);
+
+  if(!(await getDoc(foodRef)).exists()) return false;
+
   await deleteDoc(foodRef);
+  return true
 }
 
 //updates shared takes userid and product id as string and boolean
 export async function updateShared(userID, product, boolean) {
-  //updates a users product to not shared or shared depending on boolean
+  if(!isValidProduct(product) || typeof(boolean) != 'boolean') return false;
   const sharedRef = doc(db, `users/${userID}/food`, product);
+
+  if(!(await getDoc(sharedRef)).exists()) return false;
+
   await updateDoc(sharedRef, {
     shared: boolean,
   });
+  return true;
 }
 
 //updates isLow, takes userid product id as string and boolean
-export async function updateIsLow(userID, product, boolean) {
-  //updating islow is true or false depending on the boolean parameter
+export async function updateIsLow(userID, product, boolean){
+  if(!isValidProduct(product) || typeof(boolean) != 'boolean') return false;
   const unsharedRef = doc(db, `users/${userID}/food`, product);
+
+  if(!(await getDoc(unsharedRef)).exists()) return false;
+
   await updateDoc(unsharedRef, {
     isLow: boolean,
   });
+  return true;
 }
 
 export async function joinGroup(groupID, userID) {
@@ -281,15 +245,13 @@ export async function isInGroup(userID) {
   }
 }
 
-export async function getUsers(groupID) {
+export async function getUsers(groupID){
   const useritems = [];
-  var querySnapshot = await getDocs(
-    collection(db, `groups/${groupID}/members`)
-  );
+  var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
   querySnapshot.forEach((doc) => {
     useritems.push(doc.id);
   });
-  return useritems;
+  return useritems
 }
 
 export async function generateNumber() {
@@ -309,43 +271,14 @@ export async function generateNumber() {
   return randomString;
 }
 
-export async function getGroupID(userID) {
+export async function getGroupID(userID){
   const inGroup = await isInGroup(userID);
-  if (!inGroup) {
+  if(!inGroup){
     return false;
   }
-  const docRef = doc(db, "users", userID);
+  const docRef = doc(db, 'users', userID);
   const docSnapshot = await getDoc(docRef);
   const docData = docSnapshot.data();
 
   return docData.groupID;
-}
-
-export async function clearFood(userID) {
-  const collectionRef = collection(db, `users/${userID}/food`);
-  var q = query(collectionRef);
-  var querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    removeProduct(userID, doc.id);
-  });
-}
-export async function makeTestPantry() {
-  await addFood("test123", "Cheese", true, "2023 04 15", true, "2023 03 07");
-  await addFood("test123", "Ham", false, "2023 03 23", false, "2023 03 07");
-  await addFood("test123", "Onion", true, "2023 09 15", false, "2023 03 07");
-  await addFood("test123", "Soup", false, "2025 05 04", true, "2023 03 03");
-}
-
-export async function makeTestPantryG1() {
-  await addFood("testG1", "Cheese", true, "2023 04 15", true, "2023 03 07");
-  await addFood("testG1", "Ham", false, "2023 03 23", false, "2023 03 07");
-  await addFood("testG1", "Onion", true, "2023 09 15", false, "2023 03 07");
-  await addFood("testG1", "Soup", false, "2025 05 04", true, "2023 03 03");
-}
-
-export async function makeTestPantryG2() {
-  await addFood("testG2", "Pizza", false, "2023 04 15", true, "2023 03 07");
-  await addFood("testG2", "Kimchi", true, "2023 03 23", true, "2023 03 07");
-  await addFood("testG2", "Pepper", true, "2023 09 15", false, "2023 03 07");
-  await addFood("testG2", "Pork", false, "2025 05 04", true, "2023 03 03");
 }
