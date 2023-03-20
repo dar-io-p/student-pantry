@@ -283,13 +283,13 @@ export async function getGroupID(userID){
   return docData.groupID;
 }
 
-export async function getFoodAdvice(product){
-  if(!isValidProduct(product)) return false;
-
-  const foodRef = doc(db, `advice`, product);
-
-  const food = await getDoc(foodRef);
-  if(!food.exists) return false;
-
-  return food.data();
+export async function getFoodAdvice(){
+  const adviceRef = collection(db, `advice`);
+  var q = query(adviceRef);
+  var querySnapshot = await getDocs(q);
+  const foodData = []
+  querySnapshot.forEach((doc) => {
+    foodData.push(doc.data());
+  });
+  return foodData;
 }
