@@ -282,3 +282,14 @@ export async function getGroupID(userID){
 
   return docData.groupID;
 }
+
+export async function getFoodAdvice(product){
+  if(!isValidProduct(product)) return false;
+
+  const foodRef = doc(db, `advice`, product);
+
+  const food = await getDoc(foodRef);
+  if(!food.exists) return false;
+
+  return food.data();
+}
