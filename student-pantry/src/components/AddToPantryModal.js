@@ -13,16 +13,23 @@ import { AntDesign } from "@expo/vector-icons";
 import colours from "../constants/colours";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-import { addFood } from "../store/config";
+import { addFood, getNotWasted, auth } from "../store/config";
 
-export function AddToPantryModal(props) {
+export function AddToPantryModal({ setData }) {
   const today = new Date();
   const [modalVisible, setModalVisible] = useState(false);
   const [item, setItem] = useState("");
   const [pd, setPD] = useState(today);
   const [ub, setUB] = useState(today);
 
-  const id = "test123";
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
+
+  const handleAddData = () => {
+    addFood(uid, item, false, ub, false, pd).then(() => {
+      console.log("successfully added food");
+      getNotWasted(uid).then((d) => setData(d));
+    });
+  };
 
   return (
     <View>
@@ -82,7 +89,7 @@ export function AddToPantryModal(props) {
                 <Button
                   title="ADD"
                   onPress={() => {
-                    addFood(id, item, false, ub, false, pd);
+                    handleAddData();
                     setModalVisible(!modalVisible);
                   }}
                   color="black"

@@ -1,35 +1,39 @@
 import React from "react";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Button } from "react-native";
 
 import colours from "../constants/colours";
 
 import PantryScreen from "../screens/PantryScreen";
 import GroupScreen from "../screens/GroupScreen";
 import AdviceScreen from "../screens/AdviceScreen";
-import LoginScreen from "../screens/LoginScreen";
 
 import { AddToPantryModal } from "../components/AddToPantryModal";
 import { GroupModal } from "../components/GroupModal";
+import { auth } from "../store/config";
+import { signOut } from "firebase/auth";
 
 const Tab = createBottomTabNavigator();
 
-export default function TabNavigator() {
+export default function TabNavigator({ navigation }) {
   return (
     <Tab.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: colours.green },
         headerTintColor: "black",
         headerTitleStyle: { fontWeight: "bold" },
+        headerLeft: (props) => (
+          <Button
+            title="SO"
+            onPress={() => {
+              signOut(auth);
+            }}
+          />
+        ),
       }}
       tabBar={(props) => <TabBar {...props} />}
     >
-      <Tab.Screen
-        name="login"
-        component={LoginScreen}
-        options={{ title: "Login" }}
-      />
       <Tab.Screen
         name="pantry"
         component={PantryScreen}

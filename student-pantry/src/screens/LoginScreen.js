@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -8,29 +8,44 @@ import {
 } from "react-native";
 import colours from "../constants/colours";
 
+import { loginUser } from "../store/auth-config";
+
 export default function LoginScreen({ navigation }) {
-  const [userName, onChangeUser] = React.useState("Useless Text");
-  const [pass, onChangePass] = React.useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
 
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.textinput}
-        placeholder="username"
-        onChangeText={onChangeUser}
+        placeholder="E-mail"
+        onChangeText={(t) => setEmail(t)}
+        autoCapitalize="none"
       ></TextInput>
       <TextInput
         style={styles.textinput}
-        placeholder="password"
+        placeholder="Password"
         secureTextEntry={true}
-        onChangeText={onChangePass}
+        onChangeText={(t) => setPass(t)}
       ></TextInput>
 
-      <TouchableOpacity style={styles.button} onPress={() => alert("Login")}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          loginUser(email, pass)
+            .then(() => {
+              console.log("successfully logged in");
+            })
+            .catch((err) => alert("E-mail or password is incorrect"))
+        }
+      >
         <Text>Login</Text>
       </TouchableOpacity>
       <View style={{ height: "2%" }} />
-      <TouchableOpacity style={styles.button} onPress={() => alert("Login")}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("registration")}
+      >
         <Text>Signup</Text>
       </TouchableOpacity>
     </View>

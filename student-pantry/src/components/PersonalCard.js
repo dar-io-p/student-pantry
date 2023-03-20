@@ -5,18 +5,23 @@ import { View, Text, StyleSheet } from "react-native";
 import colours from "../constants/colours";
 import OptionMenu from "react-native-option-menu";
 import { AntDesign } from "@expo/vector-icons";
+import {
+  updateShared,
+  updateIsLow,
+  updateWasted,
+  removeProduct,
+  auth,
+} from "../store/config";
 
-/**Pass as props: low: bool, item: string, bought: string, useby: string isShared: bool
-/Like this: \<PersonalCard low={true} item="Onion" useby="xxxz" isShared={true}>*/
-//id, isLow, isWasted, owner, purchaseDate, shared, useBy
+/**Pass as props: 
+id, isLow, isWasted, owner, purchaseDate, shared, useBy*/
 export const PersonalCard = (props) => {
-  //const [isLow, setIslow] = useState(false);
+  //const [isLow, setIsLow] = useState(props.isLow);
+  //const [shared, setShared] = useState(props.shared);
+  const uid = auth.currentUser ? auth.currentUser.displayName : "";
+
   const col = props.isLow && props.isLow ? colours.alertRed : colours.green;
   const fontCol = props.isLow && props.isLow ? colours.white : colours.black;
-
-  //options for card
-  //mark low, delete (used), delete (wasted), get info
-  const [options, optionFuncs] = getOptions(props.isLow);
 
   //formatting of date strings
   const ub_date = new Date(props.useBy.seconds * 1000);
@@ -24,6 +29,43 @@ export const PersonalCard = (props) => {
 
   const pd_date = new Date(props.purchaseDate.seconds * 1000);
   const purchaseDate = pd_date.toLocaleDateString("en-uk");
+
+  const options = [
+    props.isLow ? "Mark High" : "Mark Low",
+    props.shared ? "Remove from shared pantry" : "Add to shared pantry",
+    "Waste",
+    "Delete",
+    "Get info",
+  ];
+
+  const optionFuncs = [
+    () => {
+      //UPDATE IS LOW
+      updateIsLow(uid, props.id, !props.isLow).then(() =>
+        props.setDBUpdate(true)
+      );
+    },
+    () => {
+      //UPDATE SHARED
+      updateShared(uid, props.id, !props.shared).then(() => {
+        props.setDBUpdate(true);
+        console.log("Updated Shared");
+      });
+    },
+    () => {
+      //ADD IT TO WASTED
+      updateWasted(uid, props.id)
+        .then(() => {
+          props.setDBUpdate(true);
+          console.log("Wasted");
+        })
+        .catch((err) => console.log(err));
+    },
+    () => {
+      removeProduct(uid, props.id).then(() => props.setDBUpdate(true));
+    },
+    () => alert("info"),
+  ];
 
   const buttonIcon = (
     <AntDesign name="exclamationcircle" size={28} color="black" />
@@ -85,19 +127,6 @@ export const PersonalCard = (props) => {
     </Card>
   );
 };
-
-function getOptions(isLow) {
-  const opt = isLow ? "Mark High" : "Mark Low";
-  const options = [opt, "Add to shared pantry", "Waste", "Delete", "Get info"];
-  const funcs = [
-    () => alert("Marked"),
-    () => alert("Shared"),
-    () => alert("Wasted"),
-    () => alert("Deleted"),
-    () => alert("info"),
-  ];
-  return [options, funcs];
-}
 
 const styles = StyleSheet.create({
   title: {
