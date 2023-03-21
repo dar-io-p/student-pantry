@@ -46,6 +46,6 @@ export async function loginUser(email, password) {
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    alert(error);
+    console.log(error);
   }
 }

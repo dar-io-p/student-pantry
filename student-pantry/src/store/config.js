@@ -31,6 +31,7 @@ export const db = getFirestore(app);
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
+// export const auth = getAuth(app)
 
 /*food items must be of form 
 {
@@ -126,6 +127,7 @@ export async function getFood(userID) {
 
 //returns list of food items for all users in a pantry
 export async function getSharedPantry(groupID) {
+  if(typeof(groupID) != 'string') return false;
   var querySnapshot = await getDocs(
     collection(db, `groups/${groupID}/members`)
   );
@@ -142,11 +144,12 @@ export async function getSharedPantry(groupID) {
 }
 
 // moves item to wasteHistory
-export async function updateWasted(userID, product) {
-  if (!isValidProduct(product));
-  const foodRef = doc(db, `users/${userID}/food`, product);
-  const foodData = await getDoc(foodRef);
-  if (!foodData.exists()) return false;
+export async function updateWasted(userID, product){
+  if(!isValidProduct(product)) return false;
+  const foodRef = doc(collection(db, `users/${userID}/food`), product);
+  const foodData = await getDoc(foodRef)
+
+  if(!foodData.exists()) return false;
 
   const wasteRef = collection(db, `users/${userID}/wasteHistory`);
   const newRef = doc(wasteRef, product);
@@ -208,6 +211,7 @@ export async function updateIsLow(userID, product, boolean) {
 }
 
 export async function joinGroup(groupID, userID) {
+  if(typeof(userID) != 'string') return false;
   const groupRef = doc(db, `groups/${groupID}`);
   const userRef = doc(db, `users`, userID);
 
@@ -215,6 +219,8 @@ export async function joinGroup(groupID, userID) {
   if (!groupDoc.exists()) {
     return false;
   }
+
+  if(!(await getDoc(userRef)).exists()) return false;
 
   await updateDoc(userRef, {
     groupID: groupID,
@@ -230,6 +236,8 @@ export async function joinGroup(groupID, userID) {
 }
 
 export async function leaveGroup(groupID, userID) {
+  if(typeof(userID) != 'string') return false;
+  if(typeof(groupID) != 'string') return false;
   const groupRef = doc(db, `groups/${groupID}`);
   const userRef = doc(db, `users/${userID}`);
 
@@ -238,7 +246,9 @@ export async function leaveGroup(groupID, userID) {
     return false;
   }
 
+  if(!(await getDoc(userRef)).exists()) return false;
   const userDoc = await getDoc(userRef);
+
   const userGroupID = userDoc.data().groupID;
 
   await updateDoc(userRef, {
@@ -257,17 +267,26 @@ export async function leaveGroup(groupID, userID) {
 }
 
 export async function createGroup(groupID, userID) {
+  if(typeof(userID) != 'string') return false;
+  if(typeof(groupID) != 'string') return false;
+
+  const userRef = doc(db, `users/${userID}`);
+  if(!(await getDoc(userRef)).exists()) return false;
+
   const groupsRef = collection(db, `groups`);
-  const newGroupRef = doc(groupsRef, groupID.toString());
+  const newGroupRef = doc(groupsRef, groupID);
   await setDoc(newGroupRef, {});
   await joinGroup(groupID, userID);
   return true;
 }
 
-export async function isInGroup(userID) {
+export async function isInGroup(userID){
+  if(typeof(userID) != 'string') return false;
   const docRef = doc(db, "users", userID);
   const docSnapshot = await getDoc(docRef);
+  if(!docSnapshot.exists()) return false;
   const docData = docSnapshot.data();
+
 
   if (docData && docData.hasOwnProperty("groupID")) {
     return true;
@@ -277,6 +296,7 @@ export async function isInGroup(userID) {
 }
 
 export async function getUsers(groupID) {
+  if(typeof(groupID) != 'string') return false;
   const useritems = [];
   var querySnapshot = await getDocs(
     collection(db, `groups/${groupID}/members`)

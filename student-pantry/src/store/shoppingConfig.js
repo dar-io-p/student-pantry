@@ -22,6 +22,10 @@ export async function getShoppingList(userID) {
 
 export async function addFoodShoppingList(userID, product) {
   if(!isValidProduct(product)) return false;
+  if(typeof(userID) != 'string') return false;
+  const userRef = doc(db, `users/${userID}`);
+  if(!(await getDoc(userRef)).exists()) return false;
+
 
   const listRef = collection(db, `users/${userID}/shoppingList`);
   const food = doc(listRef, product);
@@ -31,6 +35,10 @@ export async function addFoodShoppingList(userID, product) {
 
 export async function removeFoodShoppingList(userID, product) {
   if(!isValidProduct(product)) return false;
+  if(typeof(userID) != 'string') return false;
+  const userRef = doc(db, `users/${userID}`);
+  if(!(await getDoc(userRef)).exists()) return false;
+
   const foodRef = doc(collection(db, `users/${userID}/shoppingList`), product);
 
   if(!(await getDoc(foodRef)).exists()) return false;

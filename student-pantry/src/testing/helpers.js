@@ -31,16 +31,9 @@ export async function makeTestPantry(userID){
   await addFood(userID, "Soup", false, new Date("2025 05 04"), true, new Date("2023 03 07"))
 }
 
-export async function makeTestPantryG1(){
-  await addFood("testG1", "Cheese", true, "2023 04 15", true, "2023 03 07")
-  await addFood("testG1", "Ham", false, "2023 03 23", false, "2023 03 07")
-  await addFood("testG1", "Onion", true, "2023 09 15", false, "2023 03 07")
-  await addFood("testG1", "Soup", false, "2025 05 04", true, "2023 03 03")
-}
-
 export async function makeTestPantryG2(){
-  await addFood("testG2", "Pizza", false, "2023 04 15", true, "2023 03 07")
-  await addFood("testG2", "Kimchi", true, "2023 03 23", true, "2023 03 07")
-  await addFood("testG2", "Pepper", true, "2023 09 15", false, "2023 03 07")
-  await addFood("testG2", "Pork", false, "2025 05 04", true, "2023 03 03")
+  await addFood("testG2", "Pizza", false, new Date("2023 04 15"), true, new Date("2023 03 07"));
+  await addFood("testG2", "Kimchi", true, new Date("2023 03 23"), true, new Date("2023 03 07"))
+  await addFood("testG2", "Pepper", true, new Date("2023 09 15"), false, new Date("2023 03 07"))
+  await addFood("testG2", "Pork", false, new Date("2025 05 04"), true, new Date("2023 03 07"))
 }
