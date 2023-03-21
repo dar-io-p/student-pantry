@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ScrollView } from "react-native";
 import { GroupCardView } from "../components/GroupCardView";
 import { GroupModal } from "../components/GroupModal";
 
@@ -7,6 +7,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { getSharedPantry, isInGroup, getGroupID } from "../store/config";
 
 import { auth } from "../store/config";
+import SharedShoppingList from "../components/SharedShoppingList";
 
 export default function GroupScreen({ navigation }) {
   const uid = auth.currentUser ? auth.currentUser.displayName : "";
@@ -23,7 +24,7 @@ export default function GroupScreen({ navigation }) {
       .then((val) => {
         setInGroup(val);
       })
-      .catch((err) => console.log("1"));
+      .catch((err) => console.log(err));
   }, []);
 
   //SECOND EFFECT GET THE GROUP ID
@@ -33,7 +34,7 @@ export default function GroupScreen({ navigation }) {
         .then((val) => {
           setgroupid(val);
         })
-        .catch((err) => console.log("4"));
+        .catch((err) => console.log(err));
   }, [inGroup]);
 
   //THIRD EFFECT GET THE PANTRY ONCE THE GROUPID HAS BEEN FETCHED OR THE SCREEN IS FOCUSSED
@@ -41,7 +42,7 @@ export default function GroupScreen({ navigation }) {
     inGroup &&
       getSharedPantry(groupid)
         .then((d) => setData(d))
-        .catch((err) => console.log(groupid));
+        .catch((err) => console.log(err));
   }, [groupid, isFocused]);
 
   useEffect(() => {
@@ -49,13 +50,15 @@ export default function GroupScreen({ navigation }) {
       .then((val) => {
         setInGroup(val);
       })
-      .catch((err) => console.log("5"));
+      .catch((err) => console.log(err));
 
     inGroup &&
-      getSharedPantry(groupid).then((d) => {
-        setData(d);
-        setDBUpdate(false);
-      });
+      getSharedPantry(groupid)
+        .then((d) => {
+          setData(d);
+          setDBUpdate(false);
+        })
+        .catch((err) => console.log(err));
 
     inGroup &&
       getGroupID(uid)
@@ -79,15 +82,50 @@ export default function GroupScreen({ navigation }) {
     });
   }, [navigation, setData, inGroup]);
 
-  return (
-    <View style={styles.container}>
-      <GroupCardView data={data} inGroup={inGroup} setDBUpdate={setDBUpdate} />
-    </View>
-  );
+  if (inGroup)
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <GroupCardView
+            data={data}
+            inGroup={inGroup}
+            setDBUpdate={setDBUpdate}
+          />
+          <SharedShoppingList
+            inGroup={inGroup}
+            style={styles.shopping}
+            groupid={groupid}
+          />
+        </ScrollView>
+      </View>
+    );
+  else
+    return (
+      <View style={styles.container}>
+        <View style={styles.notInGroup}>
+          <Text style={{ fontSize: 20 }}>You are not in a group.</Text>
+          <Text style={{ fontSize: 20, padding: 20 }}>
+            Press the Button in the top right corner to create a new group or
+            join an existing group
+          </Text>
+        </View>
+      </View>
+    );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  notInGroup: {
+    flex: 1,
+    paddingTop: 50,
+    alignItems: "center",
+  },
+  shopping: {
+    marginVertical: 10,
+    paddingVertical: 10,
+    flex: 1,
+    borderWidth: 1,
   },
 });

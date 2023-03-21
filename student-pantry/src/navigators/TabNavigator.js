@@ -25,10 +25,11 @@ export default function TabNavigator({ navigation }) {
         headerTitleStyle: { fontWeight: "bold" },
         headerLeft: (props) => (
           <Button
-            title="SO"
+            title="Sign Out"
             onPress={() => {
               signOut(auth);
             }}
+            color={colours.white}
           />
         ),
       }}
@@ -54,6 +55,7 @@ export default function TabNavigator({ navigation }) {
         name="advice"
         component={AdviceScreen}
         options={{ title: "Advice" }}
+        initialParams={{ search: "" }}
       />
     </Tab.Navigator>
   );

@@ -23,10 +23,9 @@ const styles = StyleSheet.create({
     flexDirenction: "row",
     justifyContent: "space-evenly",
     backgroundColor: colours.green,
-    borderRadius: 10,
+    borderRadius: 20,
     width: width * 0.45,
     height: width * 0.4,
-    //margin: "3%",
     padding: 10,
   },
 });

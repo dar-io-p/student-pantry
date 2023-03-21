@@ -7,3 +7,5 @@ react-native-option-menu
 @expo/vector-icons
 @react-native-community/datetimepicker
 react-native-dialog
+react-native-expandable-listview
+react-native-reanimated

@@ -79,11 +79,13 @@ function ModalContents({
   uid,
 }) {
   const handleLeaveGroup = () => {
-    leaveGroup(groupid, uid).then((result) => {
-      if (result) console.log("Success");
-      else console.log("Fail");
-      setDBUpdate(true);
-    });
+    leaveGroup(groupid, uid)
+      .then((result) => {
+        if (result) console.log("Success");
+        else console.log("Fail");
+        setDBUpdate(true);
+      })
+      .catch((err) => console.log(err));
     setModalVisible(!modalVisible);
   };
 
@@ -116,7 +118,7 @@ function ModalContents({
   const handleJoinGroup = () => {
     joinGroup(groupid, uid).then((result) => {
       if (result) console.log("Success");
-      else console.log("FAIL");
+      else console.log("FAILED TO JOIN GROUP");
       setDBUpdate(true);
     });
     setModalVisible(!modalVisible);

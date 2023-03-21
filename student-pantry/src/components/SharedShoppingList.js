@@ -10,28 +10,27 @@ import {
 
 import Dialog from "react-native-dialog";
 import {
-  getShoppingList,
-  addFoodShoppingList,
-  removeFoodShoppingList,
+  getGroupShoppingList,
+  addFoodGroupShoppingList,
+  removeFoodGroupShoppingList,
 } from "../store/shoppingConfig";
 
-import { auth } from "../store/config";
-
-export default function ({ style, groupid }) {
-  const uid = auth.currentUser ? auth.currentUser.displayName : "";
-
+export default function ({ style, groupid, inGroup }) {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [newItemText, setNewItemText] = useState("");
   const [data, setData] = useState([]);
   const [dbUpdate, setDPUpdate] = useState(false);
 
   useEffect(() => {
-    getShoppingList(uid)
-      .then((newdata) => {
-        setData(newdata);
-        setDPUpdate(false);
-      })
-      .catch((err) => console.log(err));
+    inGroup &&
+      getGroupShoppingList(groupid)
+        .then((newdata) => {
+          setData(newdata);
+          setDPUpdate(false);
+        })
+        .catch((err) =>
+          console.log("error getting group shooping list: " + err)
+        );
   }, [dialogVisible, dbUpdate]);
 
   const handleCancel = () => {
@@ -39,19 +38,26 @@ export default function ({ style, groupid }) {
   };
 
   const handleAdd = async () => {
-    addFoodShoppingList(uid, newItemText).then(() => {
-      console.log("Successfully added to shopping list");
-      setDPUpdate(true);
-    });
+    addFoodGroupShoppingList(groupid, newItemText)
+      .then(() => {
+        console.log(
+          "Successfully added to shared shopping list to %s",
+          groupid
+        );
+        setDPUpdate(true);
+      })
+      .catch((err) => console.log(err));
     setDialogVisible(false);
   };
 
   const handleDelete = (item) => {
-    removeFoodShoppingList(uid, item).then(() => {
-      console.log("Successfully Removed from shopping list");
-      setDPUpdate(true);
-      setDialogVisible(false);
-    });
+    removeFoodGroupShoppingList(groupid, item)
+      .then(() => {
+        console.log("Successfully Removed from shopping list");
+        setDPUpdate(true);
+        setDialogVisible(false);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (

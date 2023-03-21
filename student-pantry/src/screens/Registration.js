@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { registerUser } from "../store/auth-config";
+import colours from "../constants/colours";
 
 const Registration = () => {
   const [email, setEmail] = useState("");
@@ -74,39 +75,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
-    marginTop: 50,
-    height: 70,
-    width: 250,
-    backgroundColor: "#026efd",
-    alignItems: "center",
+    width: "55%",
+    height: "8%",
+    backgroundColor: colours.green,
+    borderRadius: 15,
     justifyContent: "center",
-    borderRadius: 50,
-  },
-});
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
     alignItems: "center",
-    marginTop: 80,
-  },
-  textInput: {
-    paddingTop: 20,
-    paddingBottom: 10,
-    width: 400,
-    fontSize: 20,
-    borderBottomColor: "#000",
-    borderBottomWidth: 1,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  button: {
-    marginTop: 50,
-    height: 70,
-    width: 250,
-    backgroundColor: "#026efd",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 50,
   },
 });

@@ -26,23 +26,26 @@ export default function (props) {
   const [dbUpdate, setDPUpdate] = useState(false);
 
   useEffect(() => {
-    getShoppingList(uid)
-      .then((newdata) => {
-        setData(newdata);
-        setDPUpdate(false);
-      })
-      .catch((err) => console.log(err));
+    auth.currentUser &&
+      getShoppingList(uid)
+        .then((newdata) => {
+          setData(newdata);
+          setDPUpdate(false);
+        })
+        .catch((err) => console.log(err));
   }, [dialogVisible, dbUpdate]);
 
   const handleCancel = () => {
     setDialogVisible(false);
   };
 
-  const handleAdd = async () => {
-    addFoodShoppingList(uid, newItemText).then(() => {
-      console.log("Successfully added to shopping list");
-      setDPUpdate(true);
-    });
+  const handleAdd = () => {
+    addFoodShoppingList(uid, newItemText)
+      .then(() => {
+        console.log("Successfully added to shopping list");
+        setDPUpdate(true);
+      })
+      .catch((err) => console.log(err));
     setDialogVisible(false);
   };
 

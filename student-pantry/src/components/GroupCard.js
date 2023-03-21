@@ -37,16 +37,20 @@ export const GroupCard = (props) => {
   const optionFuncs = [
     () => {
       //UPDATE IS LOW
-      updateIsLow(props.owner, props.id, !props.isLow).then(() =>
-        props.setDBUpdate(true)
-      );
+      updateIsLow(props.owner, props.id, !props.isLow)
+        .then(() => props.setDBUpdate(true))
+        .catch((err) => console.log(err));
     },
     () => {
       //ADD IT TO WASTED
-      updateWasted(props.owner, props.id).then(() => props.setDBUpdate(true));
+      updateWasted(props.owner, props.id)
+        .then(() => props.setDBUpdate(true))
+        .catch((err) => console.log(err));
     },
     () => {
-      removeProduct(props.owner, props.id).then(() => props.setDBUpdate(true));
+      removeProduct(props.owner, props.id)
+        .then(() => props.setDBUpdate(true))
+        .catch((err) => console.log(err));
     },
     () => alert("info"),
   ];

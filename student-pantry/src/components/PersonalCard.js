@@ -13,9 +13,12 @@ import {
   auth,
 } from "../store/config";
 
+import { useNavigation } from "@react-navigation/native";
+
 /**Pass as props: 
 id, isLow, isWasted, owner, purchaseDate, shared, useBy*/
 export const PersonalCard = (props) => {
+  const navigation = useNavigation();
   //const [isLow, setIsLow] = useState(props.isLow);
   //const [shared, setShared] = useState(props.shared);
   const uid = auth.currentUser ? auth.currentUser.displayName : "";
@@ -36,6 +39,7 @@ export const PersonalCard = (props) => {
     "Waste",
     "Delete",
     "Get info",
+    "Cancel",
   ];
 
   const optionFuncs = [
@@ -64,9 +68,11 @@ export const PersonalCard = (props) => {
     () => {
       removeProduct(uid, props.id).then(() => props.setDBUpdate(true));
     },
-    () => alert("info"),
+    () => {
+      navigation.navigate("advice", { search: props.id });
+    },
+    () => console.log("closed"),
   ];
-
   const buttonIcon = (
     <AntDesign name="exclamationcircle" size={28} color="black" />
   );

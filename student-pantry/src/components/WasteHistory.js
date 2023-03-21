@@ -8,10 +8,12 @@ export default function ({ style, dbUpdate }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    getWasted(uid).then((val) => {
-      setData(val);
-      console.log("Waste updated");
-    });
+    getWasted(uid)
+      .then((val) => {
+        setData(val);
+        console.log("Waste updated");
+      })
+      .catch((err) => console.log("error getting food :" + err));
   }, [dbUpdate]);
 
   return (

@@ -4,7 +4,7 @@ import { CardView } from "../components/CardView";
 import { AddToPantryModal } from "../components/AddToPantryModal";
 import { useIsFocused } from "@react-navigation/native";
 
-import { getNotWasted } from "../store/config";
+import { getFood } from "../store/config";
 import ShoppingList from "../components/ShoppingList";
 import WasteHistory from "../components/WasteHistory";
 
@@ -19,16 +19,22 @@ export default function PantryScreen({ navigation }) {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    getNotWasted(uid).then((d) => {
-      setData(d);
-    });
+    auth.currentUser &&
+      getFood(uid)
+        .then((d) => {
+          setData(d);
+        })
+        .catch((err) => console.log(err));
   }, [isFocused]);
 
   useEffect(() => {
-    getNotWasted(uid).then((d) => {
-      setData(d);
-      setDBUpdate(false);
-    });
+    auth.currentUser &&
+      getFood(uid)
+        .then((d) => {
+          setData(d);
+          setDBUpdate(false);
+        })
+        .catch((err) => console.log(err));
   }, [dbUpdate]);
 
   useLayoutEffect(() => {
@@ -41,6 +47,7 @@ export default function PantryScreen({ navigation }) {
     <View style={styles.container}>
       <ScrollView>
         <CardView data={data} setDBUpdate={setDBUpdate} />
+
         <ShoppingList style={styles.shopping} />
         <WasteHistory dbUpdate={dbUpdate} style={styles.history} />
       </ScrollView>

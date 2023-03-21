@@ -1,6 +1,21 @@
-import { initializeApp } from 'firebase/app';
-import { doc, getFirestore, collection, setDoc, getDocs , Timestamp, getDoc, updateDoc, deleteDoc, deleteField, query, where} from "firebase/firestore"; 
-import {getAuth} from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import {
+  doc,
+  getFirestore,
+  collection,
+  setDoc,
+  getDocs,
+  Timestamp,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  deleteField,
+  query,
+  where,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDADBZ0U_i7OPlgIdu1t5wgz8NJT9ifzU0",
@@ -13,7 +28,9 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export const auth = getAuth(app);
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
 /*food items must be of form 
 {
@@ -26,22 +43,35 @@ purchaseDate: purchaseDate,
 }
 */
 
-export function isValidProduct(product){
-  if(typeof(product) == 'string' && /^[A-Za-z\s]*$/.test(product)){
+export function isValidProduct(product) {
+  if (typeof product == "string" && /^[A-Za-z\s]*$/.test(product)) {
     return true;
-  }
-  else{
+  } else {
     return false;
   }
 }
 
-//adds food item document by the name of product to the food list of a certain username 
-export async function addFood(userID, product, low, useby, shared, purchaseDate){
-  if(!isValidProduct(product) ||  (typeof(low) != 'boolean') || !(useby instanceof Date) || (typeof(shared) != 'boolean') ||  !(purchaseDate instanceof Date)) return false;
+//adds food item document by the name of product to the food list of a certain username
+export async function addFood(
+  userID,
+  product,
+  low,
+  useby,
+  shared,
+  purchaseDate
+) {
+  if (
+    !isValidProduct(product) ||
+    typeof low != "boolean" ||
+    !(useby instanceof Date) ||
+    typeof shared != "boolean" ||
+    !(purchaseDate instanceof Date)
+  )
+    return false;
   const userRef = doc(db, `users/${userID}`);
   const collectionRef = collection(db, `users/${userID}/food`);
 
-  if(!(await getDoc(userRef)).exists()) return false;
+  if (!(await getDoc(userRef)).exists()) return false;
 
   const fooditem = doc(collectionRef, product);
   await setDoc(fooditem, {
@@ -96,13 +126,15 @@ export async function getFood(userID) {
 
 //returns list of food items for all users in a pantry
 export async function getSharedPantry(groupID) {
-  var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
+  var querySnapshot = await getDocs(
+    collection(db, `groups/${groupID}/members`)
+  );
   var items = [];
   var members = [];
   querySnapshot.forEach((userDoc) => {
-    members.push(userDoc.id)
-  })
-  for(const user of members){
+    members.push(userDoc.id);
+  });
+  for (const user of members) {
     var userData = await getShared(user);
     items = items.concat(userData);
   }
@@ -110,11 +142,11 @@ export async function getSharedPantry(groupID) {
 }
 
 // moves item to wasteHistory
-export async function updateWasted(userID, product){
-  if(!isValidProduct(product));
+export async function updateWasted(userID, product) {
+  if (!isValidProduct(product));
   const foodRef = doc(db, `users/${userID}/food`, product);
-  const foodData = await getDoc(foodRef)
-  if(!foodData.exists()) return false;
+  const foodData = await getDoc(foodRef);
+  if (!foodData.exists()) return false;
 
   const wasteRef = collection(db, `users/${userID}/wasteHistory`);
   const newRef = doc(wasteRef, product);
@@ -122,7 +154,6 @@ export async function updateWasted(userID, product){
   await removeProduct(userID, product);
   return true;
 }
-
 
 //should be called every time pantry accessed
 //checks for all nonwasted foods where current date is past use by date
@@ -140,22 +171,22 @@ export async function updateExpired(userID) {
 }
 
 //deletes product from pantry takes user id product id as string
-export async function removeProduct(userID, product){
-  if(!isValidProduct(product)) return false;
+export async function removeProduct(userID, product) {
+  if (!isValidProduct(product)) return false;
   const foodRef = doc(collection(db, `users/${userID}/food`), product);
 
-  if(!(await getDoc(foodRef)).exists()) return false;
+  if (!(await getDoc(foodRef)).exists()) return false;
 
   await deleteDoc(foodRef);
-  return true
+  return true;
 }
 
 //updates shared takes userid and product id as string and boolean
 export async function updateShared(userID, product, boolean) {
-  if(!isValidProduct(product) || typeof(boolean) != 'boolean') return false;
+  if (!isValidProduct(product) || typeof boolean != "boolean") return false;
   const sharedRef = doc(db, `users/${userID}/food`, product);
 
-  if(!(await getDoc(sharedRef)).exists()) return false;
+  if (!(await getDoc(sharedRef)).exists()) return false;
 
   await updateDoc(sharedRef, {
     shared: boolean,
@@ -164,11 +195,11 @@ export async function updateShared(userID, product, boolean) {
 }
 
 //updates isLow, takes userid product id as string and boolean
-export async function updateIsLow(userID, product, boolean){
-  if(!isValidProduct(product) || typeof(boolean) != 'boolean') return false;
+export async function updateIsLow(userID, product, boolean) {
+  if (!isValidProduct(product) || typeof boolean != "boolean") return false;
   const unsharedRef = doc(db, `users/${userID}/food`, product);
 
-  if(!(await getDoc(unsharedRef)).exists()) return false;
+  if (!(await getDoc(unsharedRef)).exists()) return false;
 
   await updateDoc(unsharedRef, {
     isLow: boolean,
@@ -245,13 +276,15 @@ export async function isInGroup(userID) {
   }
 }
 
-export async function getUsers(groupID){
+export async function getUsers(groupID) {
   const useritems = [];
-  var querySnapshot = await getDocs(collection(db, `groups/${groupID}/members`));
+  var querySnapshot = await getDocs(
+    collection(db, `groups/${groupID}/members`)
+  );
   querySnapshot.forEach((doc) => {
     useritems.push(doc.id);
   });
-  return useritems
+  return useritems;
 }
 
 export async function generateNumber() {
@@ -271,12 +304,12 @@ export async function generateNumber() {
   return randomString;
 }
 
-export async function getGroupID(userID){
+export async function getGroupID(userID) {
   const inGroup = await isInGroup(userID);
-  if(!inGroup){
+  if (!inGroup) {
     return false;
   }
-  const docRef = doc(db, 'users', userID);
+  const docRef = doc(db, "users", userID);
   const docSnapshot = await getDoc(docRef);
   const docData = docSnapshot.data();
 
