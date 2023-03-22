@@ -24,10 +24,10 @@ test("generateNumber returns a string", async () => {
 
 describe("testing isInGroup", () => {
     beforeAll(() => {
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
     afterEach(() =>{
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
     test("isInGroup functions correctly", async () => {
         const bool1 = await joinGroup("123456", "test123");
@@ -50,10 +50,10 @@ describe("testing isInGroup", () => {
 })
 describe("testing joinGroup", () => {
     beforeAll(() => {
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
     afterEach(() =>{
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
 
     test("joinGroup functions correctly", async () => {
@@ -84,7 +84,7 @@ describe("testing joinGroup", () => {
 })
 describe("testing leaveGroup", () => {
     beforeAll(() => {
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
 
     test("leaveGroup functions as expected", async () => {
@@ -154,10 +154,10 @@ describe("testing createGroup", () => {
 
 describe("testing getUsers", () => {
     beforeEach(() => {
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
     afterAll(() => {
-        return leaveGroup("123456", "test123"), leaveGroup("123456", "test456")
+        return (leaveGroup("123456", "test123"), leaveGroup("123456", "test456"))
     })
     test("getUsers returns an array", async () => {
         await joinGroup("123456", "test123");
@@ -196,7 +196,7 @@ describe("testing getUsers", () => {
 
 describe("testing getSharedPantry", () => {
     beforeAll(() => {
-        return makeTestPantry("testG1"), makeTestPantryG2(), joinGroup("456789", "testG1"), joinGroup("456789", "testG2")
+        return (makeTestPantry("testG1"), makeTestPantryG2(), joinGroup("456789", "testG1"), joinGroup("456789", "testG2"))
     })
 
     test("getSharedPantry returns an array", async () => {

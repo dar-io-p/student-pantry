@@ -69,24 +69,30 @@ describe("testing getters for food collection", () =>{
 
 describe("Testing waste history collection", () => {
     beforeAll(() => {
-        return makeTestPantry("test123"), updateWasted("test123", "Cheese"), updateWasted("test123", "Soup");
+        return makeTestPantry("test123");
     })
     afterAll(() => {
-        return clearFood("test123"), clearWasteHistory("test123");
+        return (clearFood("test123"), clearWasteHistory("test123"));
     })
 
     test("getWasted returns expected length", async() => {
+        await updateWasted("test123", "Cheese");
+        await updateWasted("test123", "Soup");
         const data = await getWasted("test123");
         expect(data).toHaveLength(2);
     
     })
     
     test("getWasted returns an array", async () => {
+        await updateWasted("test123", "Cheese");
+        await updateWasted("test123", "Soup");
         const data = await getWasted("test123");
         expect(data).toBeInstanceOf(Array);
     })
     
     test("getWasted returns correct objects", async () => {
+        await updateWasted("test123", "Cheese");
+        await updateWasted("test123", "Soup");
         const data = await getWasted("test123");
         expect(data).toContainObject({id: "Soup", id: "Cheese"});
     })
@@ -107,7 +113,7 @@ describe("Testing setter functions", () => {
     })
 
     afterEach(() => {
-        return clearFood("test123"), clearWasteHistory("test123")
+        return (clearFood("test123"), clearWasteHistory("test123"));
     })
 
     test("addFood adds correctly", async () => {

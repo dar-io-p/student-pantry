@@ -36,6 +36,7 @@ export async function addFoodShoppingList(userID, product) {
 export async function removeFoodShoppingList(userID, product) {
   if(!isValidProduct(product)) return false;
   if(typeof(userID) != 'string') return false;
+
   const userRef = doc(db, `users/${userID}`);
   if(!(await getDoc(userRef)).exists()) return false;
 
@@ -61,6 +62,9 @@ export async function getGroupShoppingList(groupID){
 
 export async function addFoodGroupShoppingList(groupID, product) {
   if(!isValidProduct(product)) return false;
+  if(typeof(groupID) != 'string') return false;
+  const groupRef = doc(db, `groups/${groupID}`);
+  if(!(await getDoc(groupRef)).exists()) return false;
 
   const listRef = collection(db, `groups/${groupID}/shoppingList`);
   const food = doc(listRef, product);
@@ -70,6 +74,10 @@ export async function addFoodGroupShoppingList(groupID, product) {
 
 export async function removeFoodGroupShoppingList(groupID, product) {
   if(!isValidProduct(product)) return false;
+  if(typeof(groupID) != 'string') return false;
+  const groupRef = doc(db, `groups/${groupID}`);
+  if(!(await getDoc(groupRef)).exists()) return false;
+
   const foodRef = doc(collection(db, `groups/${groupID}/shoppingList`), product);
 
   if(!(await getDoc(foodRef)).exists()) return false;

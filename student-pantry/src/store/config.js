@@ -29,8 +29,8 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
 // export const auth = getAuth(app)
 
 /*food items must be of form 
