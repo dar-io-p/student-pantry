@@ -1,8 +1,8 @@
 # student-pantry
-All functionality is included in the student-pantry/src directory \n
-App entry point is App.js \n
-React components contained in src/components.\n
-Screen components in src/screens.\n
-Navigation components in src/navigators.\n
-Database functionality in src/store.\n
-Tests and helper functions in src/testing.\n
+All functionality is included in the student-pantry/src directory\
+App entry point is App.js\
+React components contained in src/components.\
+Screen components in src/screens.\
+Navigation components in src/navigators.\
+Database functionality in src/store.\
+Tests and helper functions in src/testing.
