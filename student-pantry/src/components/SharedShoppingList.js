@@ -29,7 +29,7 @@ export default function ({ style, groupid, inGroup }) {
           setDPUpdate(false);
         })
         .catch((err) =>
-          console.log("error getting group shooping list: " + err)
+          console.log("error getting group shooping list: " + groupid + err)
         );
   }, [dialogVisible, dbUpdate]);
 

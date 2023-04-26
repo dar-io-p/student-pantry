@@ -12,7 +12,7 @@ import { auth } from "../store/config";
 
 export default function PantryScreen({ navigation }) {
   const uid = auth.currentUser ? auth.currentUser.displayName : "";
-
+  console.log(uid);
   const [data, setData] = useState([]);
   const [dbUpdate, setDBUpdate] = useState(false);
 

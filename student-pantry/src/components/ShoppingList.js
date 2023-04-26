@@ -54,7 +54,7 @@ export default function (props) {
       console.log("Successfully Removed from shopping list");
       setDPUpdate(true);
       setDialogVisible(false);
-    });
+    }).catch((err) => console.log(err));
   };
 
   return (
