@@ -50,11 +50,13 @@ export default function (props) {
   };
 
   const handleDelete = (item) => {
-    removeFoodShoppingList(uid, item).then(() => {
-      console.log("Successfully Removed from shopping list");
-      setDPUpdate(true);
-      setDialogVisible(false);
-    }).catch((err) => console.log(err));
+    removeFoodShoppingList(uid, item)
+      .then(() => {
+        console.log("Successfully Removed from shopping list");
+        setDPUpdate(true);
+        setDialogVisible(false);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (

@@ -89,7 +89,7 @@ const ListModal = ({
                     setModalVisible(!visible);
                     optionFuncs[ind]();
                   }}
-                  color="white"
+                  color="black"
                 />
               </View>
             );
@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     flexDirection: "row",
-    borderTopWidth: 2,
     justifyContent: "center",
     paddingVertical: 10,
   },

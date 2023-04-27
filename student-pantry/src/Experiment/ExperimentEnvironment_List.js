@@ -53,13 +53,21 @@ export default function (props) {
   };
 
   return (
-    <View style={{ flex: 1, flexDirection: "column", alignItems: "center" }}>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       <Text style={styles.text}>{experiment[currentState].title}</Text>
       <View
         style={{
           flexDirection: "column",
           justifyContent: "flex-start",
           alignContent: "flex-start",
+          borderBottomWidth: 2,
+          borderTopWidth: 2,
         }}
       >
         {foodData.map((elem, index) => {

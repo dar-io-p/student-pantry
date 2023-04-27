@@ -8,7 +8,7 @@ import ExperimentEnvironment_List from "./ExperimentEnvironment_List";
 export default function (props) {
   return (
     <View style={styles.container}>
-      <ExperimentEnvironment_List />
+      <ExperimentEnvironment_Cards />
     </View>
   );
 }

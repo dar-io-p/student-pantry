@@ -30,7 +30,7 @@ export default function StackNavigator() {
           component={TabNavigator}
           options={{ headerShown: false }}
         /> */}
-      <Stack.Screen name="app" component={EXP_Cards} />
+      <Stack.Screen name="Pantry" component={EXP_Cards} />
     </Stack.Navigator>
   );
 }
